@@ -1,0 +1,211 @@
+--1--
+SELECT *
+FROM STUDENTS
+WHERE sid = '12345678';
+
+INSERT INTO STUDENTS VALUES('12345678','LIMING','LM@gmail.com',2002);
+
+SELECT *
+FROM STUDENTS
+WHERE sid = '12345678';
+
+
+
+--2--
+
+
+SELECT cid,COUNT(*) num,AVG(score) score
+INTO AVGCOURSE
+FROM CHOICES
+GROUP BY CID;
+
+SELECT  * FROM AVGCOURSE;
+
+DROP table AVGCOURSE;
+
+CREATE TABLE AVGCOURSE
+(
+cid CHAR(10) PRIMARY KEY ,
+num INT,
+score INT
+);
+
+SELECT  * FROM AVGCOURSE;
+
+
+INSERT INTO AVGCOURSE
+SELECT cid,COUNT(*) ,AVG(score)
+FROM CHOICES
+GROUP BY CID;
+
+SELECT  * FROM AVGCOURSE;
+
+--3--
+
+SELECT *
+FROM STUDENTS
+WHERE sname = 'LIMING';
+
+UPDATE STUDENTS SET email = 'LM@qq.com'
+WHERE sname = 'LIMING';
+
+SELECT *
+FROM STUDENTS
+WHERE sname = 'LIMING';
+--4--
+SELECT * FROM  TEACHERS ORDER BY tid;
+UPDATE TEACHERS SET salary = salary*2;
+SELECT * FROM  TEACHERS ORDER BY tid;
+
+--5--
+SELECT score
+FROM CHOICES
+WHERE sid =(
+    SELECT sid
+    FROM STUDENTS
+    WHERE sname = 'waqcj'
+    )AND cid =(
+        SELECT cid
+        FROM COURSES
+        WHERE cname = 'C++'
+    );
+
+UPDATE CHOICES SET score = score +10
+WHERE sid in (
+    SELECT sid
+    FROM STUDENTS
+    WHERE sname = 'waqcj'
+    )AND cid =(
+        SELECT cid
+        FROM COURSES
+        WHERE cname = 'C++'
+    );
+
+SELECT score
+FROM CHOICES
+WHERE sid in (
+    SELECT sid
+    FROM STUDENTS
+    WHERE sname = 'waqcj'
+    )AND cid =(
+        SELECT cid
+        FROM COURSES
+        WHERE cname = 'C++'
+    );
+--6--
+SELECT * FROM STUDENTS WHERE sname='LiMing';
+DELETE FROM STUDENTS
+WHERE sname='LiMing';
+SELECT * FROM STUDENTS WHERE sname='LiMing';
+
+--7--
+SELECT *
+FROM CHOICES
+WHERE cid =(
+    SELECT cid
+    FROM COURSES
+    WHERE cname = 'C'
+    );
+
+DELETE FROM CHOICES
+WHERE cid =(
+    SELECT cid
+    FROM COURSES
+    WHERE cname = 'C'
+    );
+--8--
+SELECT * FROM COURSES WHERE  hour >=  80;
+DELETE COURSES WHERE hour >= 80;
+SELECT * FROM COURSES WHERE  hour >=  80;
+
+
+--1--
+CREATE VIEW t_view
+AS
+    SELECT *
+    FROM TEACHERS
+    WHERE salary > 3000
+    WITH CHECK OPTION;
+
+SELECT * FROM t_view;
+--2--
+SELECT *
+FROM t_view
+WHERE email = 'xibl@izd.edu';
+
+--3--
+SELECT * FROM t_view WHERE tname = 'abc';
+INSERT INTO t_view
+VALUES ('199999998','abc','abc@def.com',5000);
+SELECT * FROM t_view WHERE tname = 'abc';
+--4--
+SELECT * FROM t_view WHERE  tid = '200010493';
+UPDATE t_view SET salary = 6000
+WHERE tid = '200010493';
+SELECT * FROM t_view WHERE  tid = '200010493';
+--5--
+DROP VIEW t_view;
+
+--3.4--
+exec sp_addlogin '张三','Aa[]12345678','School';
+exec sp_adduser  '张三';
+SELECT SYSTEM_USER;
+EXECUTE AS USER ='张三';
+SELECT SYSTEM_USER;
+SELECT  * FROM  STUDENTS;
+
+
+REVERT;
+SELECT SYSTEM_USER;
+GRANT ALL PRIVILEGES ON CHOICES TO 张三;
+GRANT ALL PRIVILEGES ON STUDENTS TO 张三;
+GRANT ALL PRIVILEGES ON COURSES TO 张三;
+GRANT ALL PRIVILEGES ON TEACHERS TO 张三;
+EXECUTE AS USER ='张三';
+SELECT SYSTEM_USER;
+SELECT  * FROM  STUDENTS;
+
+
+
+--3.5--
+--2--
+
+REVERT;
+SELECT SYSTEM_USER;
+
+CREATE VIEW ch_view
+AS
+    SELECT * FROM CHOICES
+    WHERE cid = '10005';
+
+SELECT * FROM ch_view;
+
+--3--
+GRANT INSERT ON ch_view TO 张三;
+--4--
+GRANT ALL PRIVILEGES ON ch_view(score) TO 张三;
+EXECUTE AS USER = '张三';
+SELECT SYSTEM_USER;
+SELECT score FROM ch_view;
+--5--
+REVERT ;
+SELECT SYSTEM_USER;
+GRANT ALL PRIVILEGES ON ch_view TO 张三;
+EXECUTE AS USER = '张三';
+SELECT SYSTEM_USER;
+SELECT * FROM ch_view;
+--6--
+EXECUTE AS USER = '张三';
+SELECT SYSTEM_USER;
+UPDATE ch_view SET  score=90
+WHERE no = '500127998';
+SELECT * FROM  ch_view
+WHERE no = '500127998';
+--7--
+REVERT;
+SELECT SYSTEM_USER;
+REVOKE SELECT ON ch_view TO 张三;
+EXECUTE AS USER = '张三';
+SELECT SYSTEM_USER;
+SELECT * FROM ch_view;
+
